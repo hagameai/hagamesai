@@ -72,5 +72,15 @@ All endpoints are async, use Pydantic schemas, and are protected by JWT where ap
 
 ---
 
+## LLM Integration
+
+- **LLM API Calls:**
+  - `POST /llm/call` — Call an LLM API (OpenAI, Gemini, etc.)
+  - `GET /llm/logs` — List all LLM call logs for the current user
+
+All endpoints are async, use Pydantic schemas, and are protected by JWT where appropriate. See `/docs` for full OpenAPI documentation.
+
+---
+
 ## Next Steps
-- Continue with the next module: **LLM Integration** (centralized LLM API, prompt management, error handling, etc.)
+- Continue with the next module: **Async Task Processing** (Celery integration, background jobs, etc.)

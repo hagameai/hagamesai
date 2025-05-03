@@ -5,6 +5,7 @@ from api.auth import router as auth_router
 from api.users import router as users_router
 from api.games import router as games_router
 from api.ai import router as ai_router
+from api.llm import router as llm_router
 from core.logging import get_logger
 
 logger = get_logger(__name__)
@@ -15,6 +16,7 @@ app.include_router(auth_router)
 app.include_router(users_router)
 app.include_router(games_router)
 app.include_router(ai_router)
+app.include_router(llm_router)
 
 
 @app.exception_handler(HTTPException)
