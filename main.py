@@ -4,6 +4,7 @@ from core.database import get_async_session
 from api.auth import router as auth_router
 from api.users import router as users_router
 from api.games import router as games_router
+from api.ai import router as ai_router
 from core.logging import get_logger
 
 logger = get_logger(__name__)
@@ -13,6 +14,7 @@ app = FastAPI(title="HAGAME Backend API")
 app.include_router(auth_router)
 app.include_router(users_router)
 app.include_router(games_router)
+app.include_router(ai_router)
 
 
 @app.exception_handler(HTTPException)

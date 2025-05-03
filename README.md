@@ -46,5 +46,31 @@ All endpoints require JWT authentication except registration and login. See `/do
 
 ---
 
+## Game Core Framework
+
+- **Game Definition:**
+  - `GET /games/definitions` — List all game definitions
+  - `POST /games/definitions` — Create a new game definition
+  - `GET /games/definitions/{game_def_id}` — Get a game definition by ID
+- **Game Instance:**
+  - `POST /games/instances` — Create a new game instance
+  - `GET /games/instances/{instance_id}` — Get a game instance by ID
+  - `GET /games/my-instances` — List all game instances for the current user
+
+All endpoints are async, use Pydantic schemas, and are protected by JWT where appropriate. See `/docs` for full OpenAPI documentation.
+
+---
+
+## AI Engine
+
+- **AI Model Management:**
+  - `GET /ai-models/` — List all AI models
+  - `POST /ai-models/` — Create a new AI model
+  - `GET /ai-models/{model_id}` — Get an AI model by ID
+
+All endpoints are async, use Pydantic schemas, and are protected by JWT where appropriate. See `/docs` for full OpenAPI documentation.
+
+---
+
 ## Next Steps
-- Continue with the next module: **Game Core Framework** (game definition, instance management, state engine, etc.)
+- Continue with the next module: **LLM Integration** (centralized LLM API, prompt management, error handling, etc.)
