@@ -1,22 +1,19 @@
 from pydantic import BaseModel, Field
-from typing import Any, List, Optional
+from typing import List, Optional
+
+class LLMPrompt(BaseModel):
+    prompt: str = Field(..., description="The text prompt for the LLM to process.")
+    max_tokens: Optional[int] = Field(100, description="Maximum number of tokens to generate in the response.")
+    temperature: Optional[float] = Field(0.7, description="Sampling temperature. Higher value means more randomness.")
+    top_p: Optional[float] = Field(1.0, description="Nucleus sampling parameter. Only considers the top_p probability mass.")
 
 class LLMRequest(BaseModel):
-    prompt: str = Field(..., description="The input prompt for the LLM")
-    max_tokens: Optional[int] = Field(150, description="Maximum number of tokens to generate")
-    temperature: Optional[float] = Field(0.7, description="Sampling temperature for creativity")
-    top_p: Optional[float] = Field(1.0, description="Nucleus sampling parameter")
-    stop: Optional[List[str]] = Field(None, description="List of stop sequences to end the generation")
-    additional_params: Optional[dict[str, Any]] = Field(None, description="Any additional parameters for the LLM request")
+    model: str = Field(..., description="The identifier of the model to use for the request.")
+    prompt: LLMPrompt = Field(..., description="The prompt details for the LLM.")
+    user_id: Optional[str] = Field(None, description="ID of the user making the request.")
+    session_id: Optional[str] = Field(None, description="ID of the session for tracking requests.")
 
-    class Config:
-        schema_extra = {
-            "example": {
-                "prompt": "Once upon a time...",
-                "max_tokens": 100,
-                "temperature": 0.8,
-                "top_p": 0.9,
-                "stop": ["\n"],
-                "additional_params": {"key": "value"}
-            }
-        }
+class LLMResponse(BaseModel):
+    success: bool = Field(..., description="Indicates if the request was successful.")
+    data: List[str] = Field(..., description="List of generated responses from the LLM.")
+    error: Optional[str] = Field(None, description="Error message if the request failed.")
