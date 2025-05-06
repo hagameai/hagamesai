@@ -180,6 +180,7 @@ __pycache__/
 
 # Environment
 .env
+/scripts
 
 # VSCode
 .vscode/
