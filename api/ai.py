@@ -1,41 +1,67 @@
-from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy.ext.asyncio import AsyncSession
-from schemas.ai_model import AIModelCreate, AIModelRead
-from crud.ai_model import get_by_id, create, list_all
-from core.database import get_async_session
-from core.auth import get_current_user
-from core.logging import get_logger
-import uuid
+from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy.orm import Session
+from typing import List, Dict, Any, Optional
 
-logger = get_logger(__name__)
+from schemas.ai_model import AIModelCreate, AIModelRead, AIModelUpdate
+from services import AIModelService
+from core.database import get_db
+from models.cognitive_profile import CognitiveProfile
 
-router = APIRouter(prefix="/ai-models", tags=["ai"])
+router = APIRouter(prefix="/ai_models", tags=["ai_models"])
 
 
-@router.get("/", response_model=list[AIModelRead], summary="List all AI models")
-async def list_models(session: AsyncSession = Depends(get_async_session)):
-    """List all available AI models."""
-    logger.info("Listing all AI models")
-    return [AIModelRead.from_orm(m) for m in await list_all(session)]
-
-
-@router.post("/", response_model=AIModelRead, status_code=status.HTTP_201_CREATED, summary="Create a new AI model")
+@router.post("/", response_model=AIModelRead)
 async def create_model(
-    data: AIModelCreate,
-    session: AsyncSession = Depends(get_async_session),
-    current_user=Depends(get_current_user),
+    model_data: AIModelCreate,
+    db: Session = Depends(get_db)
 ):
-    """Create a new AI model (admin only in future)."""
-    logger.info(f"User {current_user.email} creating AI model: {data.name}")
-    model = await create(session, data)
-    return AIModelRead.from_orm(model)
+    """Create a new AI model."""
+    service = AIModelService(db)
+    return await service.create_model(model_data)
 
 
-@router.get("/{model_id}", response_model=AIModelRead, summary="Get AI model by ID")
-async def get_model(model_id: uuid.UUID, session: AsyncSession = Depends(get_async_session)):
-    """Get an AI model by its ID."""
-    model = await get_by_id(session, model_id)
+@router.get("/{model_id}", response_model=AIModelRead)
+async def get_model(
+    model_id: int,
+    db: Session = Depends(get_db)
+):
+    """Get AI model by ID."""
+    service = AIModelService(db)
+    model = await service.get_model(model_id)
     if not model:
-        logger.warning(f"AI model not found: {model_id}")
-        raise HTTPException(status_code=404, detail="AI model not found.")
-    return AIModelRead.from_orm(model)
+        raise HTTPException(status_code=404, detail="Model not found")
+    return model
+
+
+@router.put("/{model_id}", response_model=AIModelRead)
+async def update_model(
+    model_id: int,
+    model_data: AIModelUpdate,
+    db: Session = Depends(get_db)
+):
+    """Update AI model configuration."""
+    service = AIModelService(db)
+    return await service.update_model(model_id, model_data)
+
+
+@router.post("/{model_id}/predict")
+async def predict(
+    model_id: int,
+    input_data: Dict[str, Any],
+    cognitive_profile: Optional[CognitiveProfile] = None,
+    db: Session = Depends(get_db)
+):
+    """Generate predictions using the AI model."""
+    service = AIModelService(db)
+    return await service.predict(model_id, input_data, cognitive_profile)
+
+
+@router.post("/{model_id}/explain")
+async def explain(
+    model_id: int,
+    input_data: Dict[str, Any],
+    db: Session = Depends(get_db)
+):
+    """Generate model explanations."""
+    service = AIModelService(db)
+    return await service.explain(model_id, input_data)
