@@ -1,50 +1,67 @@
-from fastapi import FastAPI, Request, HTTPException
-from fastapi.responses import JSONResponse
-from core.database import get_async_session
-from api.auth import router as auth_router
-from api.users import router as users_router
-from api.games import router as games_router
-from api.ai import router as ai_router
-from api.llm import router as llm_router
-from api.tasks import router as tasks_router
-from core.logging import get_logger
+"""Main application module for HAGAME AI Engine."""
 
-logger = get_logger(__name__)
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+import uvicorn
+import logging
 
-app = FastAPI(title="HAGAME Backend API")
+from api.routers import auth, users, games, ai_engine
+from core.config import settings
 
-app.include_router(auth_router)
-app.include_router(users_router)
-app.include_router(games_router)
-app.include_router(ai_router)
-app.include_router(llm_router)
-app.include_router(tasks_router)
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
 
+app = FastAPI(
+    title="HAGAME AI Engine",
+    description="Advanced AI system for game environments",
+    version="0.1.0"
+)
 
-@app.exception_handler(HTTPException)
-async def http_exception_handler(request: Request, exc: HTTPException):
-    logger.error(
-        f"HTTPException: {exc.detail} (status: {exc.status_code}) - Path: {request.url.path}")
-    return JSONResponse(
-        status_code=exc.status_code,
-        content={"detail": exc.detail, "status_code": exc.status_code},
-    )
+# Configure CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=settings.CORS_ORIGINS,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
-
-@app.get("/", tags=["health"])
-async def health_check():
-    """Health check endpoint for service status."""
-    return {"status": "ok"}
-
-# Routers will be included here as modules are implemented
-
-# Example root endpoint
+# Include routers
+app.include_router(auth.router)
+app.include_router(users.router)
+app.include_router(games.router)
+app.include_router(ai_engine.router)
 
 
-def main():
-    import uvicorn
-    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
+@app.on_event("startup")
+async def startup_event():
+    """Initialize services on application startup."""
+    logger.info("Starting HAGAME AI Engine")
 
+
+@app.on_event("shutdown")
+async def shutdown_event():
+    """Cleanup on application shutdown."""
+    logger.info("Shutting down HAGAME AI Engine")
+
+
+@app.get("/")
+async def root():
+    """Root endpoint."""
+    return {
+        "name": "HAGAME AI Engine",
+        "version": "0.1.0",
+        "status": "running"
+    }
 
 if __name__ == "__main__":
-    main()
+    uvicorn.run(
+        "main:app",
+        host=settings.HOST,
+        port=settings.PORT,
+        reload=settings.DEBUG
+    )
