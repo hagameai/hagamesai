@@ -16,3 +16,4 @@ passlib = { extras = ["bcrypt"], version = "^1.7.4" }
 python-jose = "^3.3.0"
 celery = "^5.3.0"
 redis = "^5.0.0"
+alembic = "^1.13.0"
