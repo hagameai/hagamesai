@@ -1,27 +1,22 @@
-import uuid
-from datetime import datetime
 from pydantic import BaseModel, Field
+from typing import Optional
 
-
-class GameInstanceCreate(BaseModel):
-    """Schema for creating a new game instance."""
-    game_definition_id: uuid.UUID
-    user_id: uuid.UUID | None = None
-    game_state: dict = Field(default_factory=dict)
-    ai_model_id: uuid.UUID | None = None
-
-
-class GameInstanceRead(BaseModel):
-    """Schema for reading game instance info."""
-    id: uuid.UUID
-    game_definition_id: uuid.UUID
-    user_id: uuid.UUID | None
-    status: str
-    game_state: dict
-    start_time: datetime
-    end_time: datetime | None
-    score: int | None
-    ai_model_id: uuid.UUID | None
+class GameInstance(BaseModel):
+    id: int = Field(..., description="Unique identifier for the game instance")
+    game_id: int = Field(..., description="Identifier for the associated game")
+    user_id: int = Field(..., description="Identifier for the user playing this game instance")
+    status: str = Field(..., description="Current status of the game instance (e.g., 'in_progress', 'completed')")
+    created_at: str = Field(..., description="Timestamp when the game instance was created")
+    updated_at: Optional[str] = Field(None, description="Timestamp when the game instance was last updated")
 
     class Config:
-        orm_mode = True
+        schema_extra = {
+            "example": {
+                "id": 1,
+                "game_id": 101,
+                "user_id": 201,
+                "status": "in_progress",
+                "created_at": "2023-01-01T12:00:00Z",
+                "updated_at": "2023-01-01T12:30:00Z"
+            }
+        }
