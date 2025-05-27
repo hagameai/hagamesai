@@ -2,11 +2,12 @@ from pydantic import BaseModel, Field
 from typing import Any, List, Optional
 
 class LLMResponse(BaseModel):
-    success: bool = Field(..., description="Indicates if the response was successful")
-    message: Optional[str] = Field(None, description="Optional message providing additional context")
-    data: List[Any] = Field(..., description="List of data items returned by the LLM")
+    id: str = Field(..., description="The unique identifier for the response")
+    prompt: str = Field(..., description="The input prompt given to the LLM")
+    response: str = Field(..., description="The generated response from the LLM")
+    tokens_used: int = Field(..., description="The number of tokens used in the response")
+    completion_time: float = Field(..., description="Time taken to generate the response in seconds")
+    metadata: Optional[dict[str, Any]] = Field(None, description="Optional metadata related to the response")
 
-class LLMError(BaseModel):
-    success: bool = Field(False, description="Indicates that there was an error")
-    error_code: str = Field(..., description="Code representing the error type")
-    error_message: str = Field(..., description="Description of the error")
+class LLMResponseList(BaseModel):
+    responses: List[LLMResponse] = Field(..., description="List of LLM responses")
