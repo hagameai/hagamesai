@@ -1,24 +1,36 @@
 import uuid
 from pydantic import BaseModel, Field
+from typing import Optional, Dict, Any
+from datetime import datetime
 
 
-class AIModelCreate(BaseModel):
+class AIModelBase(BaseModel):
+    name: str
+    description: Optional[str] = None
+    config: Dict[str, Any]
+    metadata: Optional[Dict[str, Any]] = None
+    file_path: Optional[str] = None
+
+
+class AIModelCreate(AIModelBase):
     """Schema for creating a new AI model."""
-    name: str = Field(..., max_length=100)
     type: str = Field(..., max_length=50)
     version: str = Field(..., max_length=20)
-    config_params: dict
-    file_path: str | None = None
 
 
-class AIModelRead(BaseModel):
+class AIModelUpdate(BaseModel):
+    name: Optional[str] = None
+    description: Optional[str] = None
+    config: Optional[Dict[str, Any]] = None
+    metadata: Optional[Dict[str, Any]] = None
+    file_path: Optional[str] = None
+
+
+class AIModelRead(AIModelBase):
     """Schema for reading AI model info."""
-    id: uuid.UUID
-    name: str
-    type: str
-    version: str
-    config_params: dict
-    file_path: str | None
+    id: int
+    created_at: datetime
+    updated_at: Optional[datetime] = None
 
     class Config:
-        orm_mode = True
+        from_attributes = True
