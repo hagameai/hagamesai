@@ -8,23 +8,34 @@ def llm_service():
     return LLMService()
 
 
-def test_llm_service_initialization(llm_service):
-    """Test the initialization of the LLMService."""
-    assert llm_service is not None
-    assert hasattr(llm_service, 'model')
-    assert llm_service.model is not None
+def test_llm_service_integration(llm_service):
+    """Test LLM service integration with valid input."""
+    response = llm_service.process_request({
+        'input_data': 'Test input for LLM',
+        'parameters': {'max_tokens': 50}
+    })
+    assert response is not None, "Expected a response from LLM service"
+    assert 'output_data' in response, "Response should contain 'output_data' key"
 
 
-def test_llm_service_predict(llm_service):
-    """Test the predict method of LLMService."""
-    input_data = "What is the capital of France?"
-    response = llm_service.predict(input_data)
-    assert isinstance(response, str)
-    assert len(response) > 0
-
-
-def test_llm_service_handle_invalid_input(llm_service):
-    """Test the predict method with invalid input."""
-    input_data = None
+def test_llm_service_error_handling(llm_service):
+    """Test LLM service integration with invalid input."""
     with pytest.raises(ValueError):
-        llm_service.predict(input_data)
+        llm_service.process_request({
+            'input_data': '',  # Invalid input
+            'parameters': {'max_tokens': 50}
+        })
+
+
+@pytest.mark.parametrize('input_data, expected_output', [
+    ('Hello, world!', 'Expected output for Hello'),
+    ('Goodbye!', 'Expected output for Goodbye')
+])
+def test_llm_service_multiple_cases(llm_service, input_data, expected_output):
+    """Test LLM service with multiple input cases."""
+    response = llm_service.process_request({
+        'input_data': input_data,
+        'parameters': {'max_tokens': 50}
+    })
+    assert response['output_data'] == expected_output,
+    f"Expected {expected_output} but got {response['output_data']}"
