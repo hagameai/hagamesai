@@ -1,24 +1,31 @@
 from fastapi import APIRouter, HTTPException, Depends
-from schemas.llm_request import LLMRequest, LLMResponse
-from core.auth import get_current_user
-from llm_service.service import process_llm_request
+from pydantic import BaseModel
+from typing import List
 
 router = APIRouter()
 
-@router.post("/llm/request", response_model=LLMResponse)
-async def request_llm_service(llm_request: LLMRequest, current_user: str = Depends(get_current_user)):
-    """
-    Endpoint to handle LLM requests.
+# Example request and response models
+class LLMRequest(BaseModel):
+    prompt: str
+    max_tokens: int = 150
+    temperature: float = 0.7
 
-    Args:
-        llm_request (LLMRequest): The LLM request data.
-        current_user (str): The current user's identifier, retrieved through authentication.
+class LLMResponse(BaseModel):
+    id: str
+    choices: List[str]
 
-    Returns:
-        LLMResponse: The response from the LLM service.
-    """
+@router.post('/llm/generate', response_model=LLMResponse)
+async def generate_llm_response(request: LLMRequest):
     try:
-        response = await process_llm_request(llm_request, current_user)
-        return response
+        # Here you would integrate with your LLM service
+        # For now, we will simulate a response
+        simulated_response = LLMResponse(
+            id="llm_123",
+            choices=["Response 1", "Response 2"]
+        )
+        return simulated_response
     except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(status_code=500, detail=str(e))
+
+# Include the router in your FastAPI app
+# app.include_router(router, prefix="/api")
