@@ -1,19 +1,24 @@
 from pydantic import BaseModel, Field
 from typing import List, Optional
 
-class LLMPrompt(BaseModel):
-    prompt: str = Field(..., description="The text prompt for the LLM to process.")
-    max_tokens: Optional[int] = Field(100, description="Maximum number of tokens to generate in the response.")
-    temperature: Optional[float] = Field(0.7, description="Sampling temperature. Higher value means more randomness.")
-    top_p: Optional[float] = Field(1.0, description="Nucleus sampling parameter. Only considers the top_p probability mass.")
-
 class LLMRequest(BaseModel):
-    model: str = Field(..., description="The identifier of the model to use for the request.")
-    prompt: LLMPrompt = Field(..., description="The prompt details for the LLM.")
-    user_id: Optional[str] = Field(None, description="ID of the user making the request.")
-    session_id: Optional[str] = Field(None, description="ID of the session for tracking requests.")
+    prompt: str = Field(..., description="The input prompt for the language model.")
+    max_tokens: int = Field(150, ge=1, le=2048, description="Maximum number of tokens to generate.")
+    temperature: float = Field(1.0, ge=0.0, le=2.0, description="Controls randomness in the output.")
+    top_p: float = Field(1.0, ge=0.0, le=1.0, description="Nucleus sampling parameter.")
+    frequency_penalty: float = Field(0.0, ge=-2.0, le=2.0, description="Penalty for using frequent tokens.")
+    presence_penalty: float = Field(0.0, ge=-2.0, le=2.0, description="Penalty for using new tokens.")
+    stop: Optional[List[str]] = Field(None, description="List of tokens to stop generation.")
 
-class LLMResponse(BaseModel):
-    success: bool = Field(..., description="Indicates if the request was successful.")
-    data: List[str] = Field(..., description="List of generated responses from the LLM.")
-    error: Optional[str] = Field(None, description="Error message if the request failed.")
+    class Config:
+        schema_extra = {
+            "example": {
+                "prompt": "Once upon a time, in a land far away...",
+                "max_tokens": 100,
+                "temperature": 0.7,
+                "top_p": 0.9,
+                "frequency_penalty": 0,
+                "presence_penalty": 0,
+                "stop": ["\n", "END"]
+            }
+        }
