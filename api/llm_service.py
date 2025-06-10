@@ -1,42 +1,24 @@
-from fastapi import APIRouter, HTTPException
-from pydantic import BaseModel
-from typing import List
+from fastapi import APIRouter, HTTPException, Depends
+from schemas.llm_request import LLMRequest, LLMResponse
+from core.auth import get_current_user
+from llm_service.service import process_llm_request
 
 router = APIRouter()
 
-class LLMRequest(BaseModel):
-    prompt: str
-    max_length: int = 50
-
-class LLMResponse(BaseModel):
-    generated_text: str
-
-@router.post("/llm/generate", response_model=LLMResponse)
-async def generate_text(request: LLMRequest):
+@router.post("/llm/request", response_model=LLMResponse)
+async def request_llm_service(llm_request: LLMRequest, current_user: str = Depends(get_current_user)):
     """
-    Generate text using the LLM based on the provided prompt.
+    Endpoint to handle LLM requests.
 
-    Parameters:
-    - request: LLMRequest containing the prompt and max_length.
+    Args:
+        llm_request (LLMRequest): The LLM request data.
+        current_user (str): The current user's identifier, retrieved through authentication.
 
     Returns:
-    - LLMResponse containing the generated text.
+        LLMResponse: The response from the LLM service.
     """
     try:
-        # Here you would normally call your LLM model to generate text
-        # For example:
-        generated_text = "This is a dummy response based on the prompt: " + request.prompt
-        return LLMResponse(generated_text=generated_text)
+        response = await process_llm_request(llm_request, current_user)
+        return response
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
-@router.get("/llm/health")
-async def health_check():
-    """
-    Health check endpoint to ensure the LLM service is running.
-
-    Returns:
-    - A simple status message.
-    """
-    return {"status": "LLM service is running"}
-
+        raise HTTPException(status_code=400, detail=str(e))
