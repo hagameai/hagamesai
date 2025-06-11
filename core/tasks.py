@@ -1,33 +1,46 @@
-import asyncio
-from typing import Any, Dict, List
+import logging
+from celery import shared_task
 
-async def process_llm_request(data: Dict[str, Any]) -> Dict[str, Any]:
-    """Process the LLM request asynchronously.
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+@shared_task
+def process_llm_response(response_data):
+    """
+    Process the response data from the LLM.
+    This function handles the asynchronous processing of LLM responses,
+    including logging and further actions based on the response.
 
     Args:
-        data (Dict[str, Any]): Input data for LLM processing.
-
-    Returns:
-        Dict[str, Any]: Output data from LLM processing.
+        response_data (dict): The response data from the LLM containing the results.
     """
-    # Simulate LLM processing with asyncio sleep
-    await asyncio.sleep(1)  # Replace with actual LLM processing logic
-    return {'status': 'success', 'data': data}
+    try:
+        logger.info("Starting LLM response processing")
+        # Simulate processing the response data
+        # TODO: Implement actual processing logic
+        processed_data = response_data  # Replace with actual processing code
+        logger.info("Successfully processed LLM response")
+        return processed_data
+    except Exception as e:
+        logger.error(f"Error processing LLM response: {str(e)}")
+        raise
 
-async def handle_llm_requests(requests: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-    """Handle multiple LLM requests concurrently.
+@shared_task
+def generate_llm_prompt(game_context):
+    """
+    Generate a prompt for the LLM based on the game context.
+    This function prepares the input for the LLM based on the current game state.
 
     Args:
-        requests (List[Dict[str, Any]]): List of requests to be processed.
-
-    Returns:
-        List[Dict[str, Any]]: Results of processing each request.
+        game_context (dict): The current context of the game to generate a prompt.
     """
-    tasks = [process_llm_request(req) for req in requests]
-    return await asyncio.gather(*tasks)
-
-# Example usage
-if __name__ == '__main__':
-    sample_requests = [{'input': 'Hello, how can AI help me today?'}, {'input': 'Tell me a joke!'}]
-    results = asyncio.run(handle_llm_requests(sample_requests))
-    print(results)  # Outputs the processed results
+    try:
+        logger.info("Generating LLM prompt")
+        # TODO: Implement prompt generation logic
+        prompt = f"Generate response based on context: {game_context}"
+        logger.info("LLM prompt generated successfully")
+        return prompt
+    except Exception as e:
+        logger.error(f"Error generating LLM prompt: {str(e)}")
+        raise
