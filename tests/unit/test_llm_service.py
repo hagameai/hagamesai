@@ -1,52 +1,41 @@
 import pytest
-from fastapi.testclient import TestClient
-from llm_service.service import app  # Import your FastAPI app
+from llm_service.service import LLMService
 
 
 @pytest.fixture
-def client():
-    with TestClient(app) as c:
-        yield c
+def llm_service():
+    """Fixture to create an instance of LLMService for testing."""
+    return LLMService()
 
 
-def test_llm_request(client):
-    """
-    Test LLM request endpoint.
-    """
-    response = client.post("/api/llm/request", json={
-        "input": "Test input"
-    })
-    assert response.status_code == 200
-    assert "output" in response.json()
+def test_llm_service_initialization(llm_service):
+    """Test that the LLMService initializes correctly."""
+    assert llm_service is not None
 
 
-def test_llm_response(client):
-    """
-    Test LLM response validation.
-    """
-    response = client.post("/api/llm/request", json={
-        "input": "Test input"
-    })
-    llm_output = response.json()["output"]
-    assert isinstance(llm_output, str)
-    assert len(llm_output) > 0
+def test_llm_service_request_handling(llm_service):
+    """Test LLM service can handle a request."""
+    request_data = {"input": "What is the capital of France?"}
+    response = llm_service.handle_request(request_data)
+    assert "output" in response
+    assert response["output"] == "The capital of France is Paris."
 
 
-def test_invalid_llm_request(client):
-    """
-    Test LLM request with invalid input.
-    """
-    response = client.post("/api/llm/request", json={})  # No input
-    assert response.status_code == 422  # Unprocessable Entity
+def test_llm_service_error_handling(llm_service):
+    """Test LLM service handles errors gracefully."""
+    invalid_request_data = {"input": None}
+    response = llm_service.handle_request(invalid_request_data)
+    assert "error" in response
+    assert response["error"] == "Invalid input"
 
 
-def test_llm_edge_case(client):
-    """
-    Test LLM request with edge case input.
-    """
-    response = client.post("/api/llm/request", json={
-        "input": ""
-    })  # Empty input
-    assert response.status_code == 422  # Unprocessable Entity
-    assert "detail" in response.json()
-
+@pytest.mark.parametrize("query, expected_output", [
+    ("Who is the president of the USA?", "The president of the USA is Joe Biden."),
+    ("What is the largest planet in our solar system?", "The largest planet in our solar system is Jupiter."),
+])
+def test_llm_service_varied_responses(llm_service, query, expected_output):
+    """Test LLM service responds correctly to varied queries."""
+    request_data = {"input": query}
+    response = llm_service.handle_request(request_data)
+    assert "output" in response
+    assert response["output"] == expected_output
