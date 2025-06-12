@@ -165,3 +165,147 @@ See the [LICENSE](LICENSE) file for the full license text and details.
 
 For questions or contributions, please refer to the technical documentation and roadmap, and follow the project coding and architectural guidelines strictly.
 
+# HAGAME AI Engine
+
+HAGAME AI Engine is an advanced artificial intelligence system designed for game environments, providing adaptive learning, cognitive modeling, and strategic decision-making capabilities.
+
+## Features
+
+### AI Engine Components
+
+1. **Adaptive Prediction Engine**
+   - Real-time prediction of game states and player behavior
+   - Adaptive learning from gameplay patterns
+   - Multi-model prediction system with confidence scoring
+
+2. **Cognitive Model Builder**
+   - Player cognitive profile generation
+   - Learning style analysis
+   - Skill level assessment and tracking
+   - Adaptability measurement
+
+3. **Quantum Uncertainty Generator**
+   - Quantum-inspired uncertainty modeling
+   - Multi-dimensional uncertainty factors
+   - Entanglement-based correlation analysis
+   - Dynamic decoherence rate adjustment
+
+4. **Collective Wisdom Aggregator**
+   - Pattern recognition across game sessions
+   - Strategy effectiveness analysis
+   - Meta-learning from collective experiences
+   - Trend and anomaly detection
+
+5. **Explainable AI (XAI)**
+   - Natural language explanations of AI decisions
+   - Feature importance analysis
+   - Counterfactual reasoning
+   - Confidence level assessment
+
+## Installation
+
+1. Clone the repository:
+```bash
+git clone https://github.com/hagame/hagamesai.git
+cd hagamesai
+```
+
+2. Create a virtual environment and activate it:
+```bash
+python -m venv .venv
+source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+```
+
+3. Install dependencies:
+```bash
+pip install -e .
+```
+
+## Configuration
+
+1. Create a `.env` file in the project root with the following variables:
+```env
+DATABASE_URL=postgresql+asyncpg://user:password@localhost/hagame
+REDIS_URL=redis://localhost:6379/0
+SECRET_KEY=your-secret-key
+ALGORITHM=HS256
+ACCESS_TOKEN_EXPIRE_MINUTES=30
+```
+
+2. Initialize the database:
+```bash
+alembic upgrade head
+```
+
+## Usage
+
+1. Start the API server:
+```bash
+uvicorn main:app --reload
+```
+
+2. Start the Celery worker:
+```bash
+celery -A core.celery_app worker --loglevel=info
+```
+
+## API Documentation
+
+Once the server is running, access the API documentation at:
+- Swagger UI: `http://localhost:8000/docs`
+- ReDoc: `http://localhost:8000/redoc`
+
+## Development
+
+### Project Structure
+
+```
+hagamesai/
+├── alembic/              # Database migrations
+├── api/                  # API routes and endpoints
+├── core/                 # Core functionality
+│   ├── ai_engine/        # AI Engine components
+│   │   ├── base.py      # Base AI component class
+│   │   ├── prediction.py # Adaptive Prediction Engine
+│   │   ├── cognitive.py  # Cognitive Model Builder
+│   │   ├── quantum.py    # Quantum Uncertainty Generator
+│   │   ├── collective.py # Collective Wisdom Aggregator
+│   │   └── xai.py       # Explainable AI
+│   ├── auth.py          # Authentication
+│   ├── config.py        # Configuration
+│   └── database.py      # Database setup
+├── crud/                 # Database operations
+├── models/              # SQLAlchemy models
+├── schemas/             # Pydantic schemas
+└── tests/               # Test suite
+```
+
+### Running Tests
+
+```bash
+pytest
+```
+
+### Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Commit your changes
+4. Push to the branch
+5. Create a Pull Request
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Acknowledgments
+
+- The HAGAME Team
+- Contributors and maintainers
+- The open-source community
+
+## Contact
+
+- Email: team@hagame.ai
+- GitHub: [https://github.com/hagame/hagamesai](https://github.com/hagame/hagamesai)
+
