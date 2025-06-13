@@ -1,69 +1,59 @@
 # Game Management Documentation
 
-This document provides an overview of game management features within the `hagamesai` project. It covers game definitions, instances, and user interactions with the game services.
+## Overview
+The game management feature provides the functionality to create, manage, and interact with game definitions and instances. This is integral to the backend for the human-vs-AI gaming scenarios facilitated by the application.
 
-## Table of Contents
-
-1. [Game Definitions](#game-definitions)
-2. [Game Instances](#game-instances)
-3. [User Interactions](#user-interactions)
-4. [API Endpoints](#api-endpoints)
-
-## Game Definitions
-
-Game definitions represent the blueprint of a game, including its rules, settings, and mechanics. In our API, a game definition can be created, read, updated, and deleted (CRUD operations). The following attributes are typically included in a game definition:
-
-- **title**: The name of the game.
-- **description**: A brief overview of the game's objectives and rules.
-- **settings**: Configuration options specific to the game.
-
-### Example of a Game Definition
-```json
-{
-  "title": "Chess",
-  "description": "A strategic board game played between two players.",
-  "settings": {
-    "time_control": "10 minutes",
-    "board_size": "8x8"
-  }
-}
-```
-
-## Game Instances
-
-A game instance is a specific occurrence of a game being played. Each game instance is created from a game definition and tracks the current state of the game. Attributes include:
-
-- **game_id**: The identifier for the game definition.
-- **players**: An array of users participating in the game.
-- **status**: Current state of the game (e.g., ongoing, finished).
-
-### Example of a Game Instance
-```json
-{
-  "game_id": "12345",
-  "players": ["user1", "user2"],
-  "status": "ongoing"
-}
-```
-
-## User Interactions
-
-Users can interact with games through various actions such as:
-- Joining a game instance.
-- Making a move in the game.
-- Leaving a game instance.
+## Features
+- **Create Game Definitions**: Allows the creation of new game types with defined rules and settings.
+- **Manage Game Instances**: Enables the initiation and management of game sessions for users.
+- **User Interaction**: Facilitates user interactions with the game instances through API endpoints.
 
 ## API Endpoints
 
-The following API endpoints are available for managing games:
+### 1. Create Game Definition
+- **Endpoint**: `POST /api/games`
+- **Description**: Create a new game definition.
+- **Request Body**:
+  ```json
+  {
+      "name": "string",
+      "description": "string",
+      "rules": "string",
+      "settings": {
+          "max_players": "integer",
+          "game_type": "string"
+      }
+  }
+  ```
+- **Response**:
+  - **Success**: Returns the created game definition object.
+  - **Error**: Returns an error message if the creation fails.
 
-- **POST /api/games**: Create a new game definition.
-- **GET /api/games/{id}**: Retrieve a specific game definition.
-- **PUT /api/games/{id}**: Update an existing game definition.
-- **DELETE /api/games/{id}**: Delete a game definition.
-- **POST /api/games/instances**: Create a new game instance.
-- **GET /api/games/instances/{id}**: Retrieve a specific game instance.
+### 2. Get Game Definitions
+- **Endpoint**: `GET /api/games`
+- **Description**: Retrieve all game definitions.
+- **Response**:
+  - Returns a list of game definitions.
+
+### 3. Start Game Instance
+- **Endpoint**: `POST /api/games/start`
+- **Description**: Start a new game instance based on a game definition.
+- **Request Body**:
+  ```json
+  {
+      "game_id": "string",
+      "players": ["string"]
+  }
+  ```
+- **Response**:
+  - **Success**: Returns the created game instance object.
+  - **Error**: Returns an error message if the instance creation fails.
+
+### 4. Get Game Instance
+- **Endpoint**: `GET /api/games/{instance_id}`
+- **Description**: Retrieve a specific game instance by its ID.
+- **Response**:
+  - Returns the game instance details, including its current state and players.
 
 ## Conclusion
-
-This documentation outlines the essential features and API endpoints related to game management in the `hagamesai` project. For further details, refer to the API reference documentation.
+The game management feature is designed to provide a comprehensive interface for managing games within the application, ensuring that users can easily create and engage in various game scenarios. This documentation will be updated as the feature evolves and further functionalities are added.
