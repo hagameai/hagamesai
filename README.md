@@ -1,6 +1,6 @@
-# HAGAME
+# HAGAMEAI
 
-This is the backend for the HAGAME project, built with FastAPI. It provides a modular, scalable, and secure API for human-vs-AI game scenarios, advanced cognitive modeling, and LLM-powered services.
+HAGAMEAI is a training framework for AI game evolution. By constructing diverse game scenario components, from strategic confrontations to simulation, it enhances AI's learning mechanisms, decision-making processes, and its ability to collaborate or compete with humans in complex environments, providing foundational AI support for all game-related scenarios.
 
 ---
 
