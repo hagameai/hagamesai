@@ -1,31 +1,25 @@
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
-from typing import List
 
 router = APIRouter()
 
-# Example request and response models
 class LLMRequest(BaseModel):
     prompt: str
-    max_tokens: int = 150
-    temperature: float = 0.7
+    max_tokens: int = 100
 
 class LLMResponse(BaseModel):
-    id: str
-    choices: List[str]
+    result: str
 
-@router.post('/llm/generate', response_model=LLMResponse)
-async def generate_llm_response(request: LLMRequest):
+@router.post("/llm/generate", response_model=LLMResponse)
+async def generate_response(request: LLMRequest):
+    """Generates a response from the LLM based on the given prompt."""
     try:
-        # Here you would integrate with your LLM service
-        # For now, we will simulate a response
-        simulated_response = LLMResponse(
-            id="llm_123",
-            choices=["Response 1", "Response 2"]
-        )
-        return simulated_response
+        # Here you would integrate with your LLM service to generate a response
+        # For now, we'll simulate a response
+        simulated_response = f"Response to: {request.prompt}"
+        return LLMResponse(result=simulated_response)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-# Include the router in your FastAPI app
-# app.include_router(router, prefix="/api")
+# Include this router in your main API application
+
