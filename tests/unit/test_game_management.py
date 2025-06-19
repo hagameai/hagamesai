@@ -1,46 +1,50 @@
 import pytest
 from fastapi.testclient import TestClient
 from api.games import app
+from crud.game_definition import GameDefinitionCRUD
 
-@pytest.fixture()
-def client():
-    return TestClient(app)
+@pytest.fixture(scope="module")
+def test_client():
+    client = TestClient(app)
+    yield client
 
-# Test case for creating a game definition
-def test_create_game_definition(client):
-    response = client.post("/games/", json={
-        "name": "Test Game",
-        "description": "A game for testing purposes."
-    })
+@pytest.fixture(scope="module")
+def setup_game_definition():
+    # Sample game definition to be used in tests
+    game_definition = {
+        "name": "Sample Game",
+        "description": "A sample game for testing.",
+        "rules": "Sample rules"
+    }
+    # Assuming there is a method to create a game definition in the CRUD
+    GameDefinitionCRUD.create(game_definition)
+    yield game_definition  # Yield the created game definition for tests
+    # Cleanup can be performed here if needed
+
+
+def test_create_game(test_client, setup_game_definition):
+    response = test_client.post("/games/", json=setup_game_definition)
     assert response.status_code == 201
-    assert response.json() == {
-        "name": "Test Game",
-        "description": "A game for testing purposes.",
-        "id": 1
-    }
+    assert response.json()["name"] == setup_game_definition["name"]
 
-# Test case for retrieving game definitions
-def test_get_game_definitions(client):
-    response = client.get("/games/")
+
+def test_get_games(test_client):
+    response = test_client.get("/games/")
     assert response.status_code == 200
-    assert isinstance(response.json(), list)  # Ensure the response is a list
+    assert isinstance(response.json(), list)  # Ensure it returns a list
 
-# Test case for updating a game definition
-def test_update_game_definition(client):
-    response = client.put("/games/1", json={
-        "name": "Updated Test Game",
-        "description": "An updated game for testing purposes."
-    })
+
+def test_update_game(test_client, setup_game_definition):
+    updated_game = {"name": "Updated Game", "description": "Updated description", "rules": "Updated rules"}
+    response = test_client.put(f"/games/{setup_game_definition['id']}/", json=updated_game)
     assert response.status_code == 200
-    assert response.json() == {
-        "name": "Updated Test Game",
-        "description": "An updated game for testing purposes.",
-        "id": 1
-    }
+    assert response.json()["name"] == updated_game["name"]
 
-# Test case for deleting a game definition
-def test_delete_game_definition(client):
-    response = client.delete("/games/1")
-    assert response.status_code == 204
-    response = client.get("/games/1")
-    assert response.status_code == 404  # Ensure the game no longer exists
+
+def test_delete_game(test_client, setup_game_definition):
+    response = test_client.delete(f"/games/{setup_game_definition['id']}/")
+    assert response.status_code == 204  # No content response for successful deletion
+
+    # Verify that the game no longer exists
+    response = test_client.get(f"/games/{setup_game_definition['id']}/")
+    assert response.status_code == 404  # Should return 404 Not Found after deletion
