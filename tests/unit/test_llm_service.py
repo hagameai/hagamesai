@@ -2,40 +2,47 @@ import pytest
 from llm_service.service import LLMService
 
 
-@pytest.fixture
-def llm_service():
-    """Fixture to create an instance of LLMService for testing."""
-    return LLMService()
+def test_llm_service_initialization():
+    """
+    Test initialization of the LLMService.
+    """
+    service = LLMService()
+    assert service is not None,
+           "LLMService should be initialized successfully"
 
 
-def test_llm_service_initialization(llm_service):
-    """Test that the LLMService initializes correctly."""
-    assert llm_service is not None
+def test_llm_service_predict():
+    """
+    Test the predict method of LLMService.
+    """
+    service = LLMService()
+    input_data = "Sample input for prediction"
+    result = service.predict(input_data)
+    assert result is not None,
+           "Predict should return a result"
+    assert isinstance(result, dict),
+           "Predict result should be a dictionary"
 
 
-def test_llm_service_request_handling(llm_service):
-    """Test LLM service can handle a request."""
-    request_data = {"input": "What is the capital of France?"}
-    response = llm_service.handle_request(request_data)
-    assert "output" in response
-    assert response["output"] == "The capital of France is Paris."
+def test_llm_service_handle_invalid_input():
+    """
+    Test handling of invalid input in the predict method.
+    """
+    service = LLMService()
+    with pytest.raises(ValueError):
+        service.predict(None)
 
 
-def test_llm_service_error_handling(llm_service):
-    """Test LLM service handles errors gracefully."""
-    invalid_request_data = {"input": None}
-    response = llm_service.handle_request(invalid_request_data)
-    assert "error" in response
-    assert response["error"] == "Invalid input"
-
-
-@pytest.mark.parametrize("query, expected_output", [
-    ("Who is the president of the USA?", "The president of the USA is Joe Biden."),
-    ("What is the largest planet in our solar system?", "The largest planet in our solar system is Jupiter."),
-])
-def test_llm_service_varied_responses(llm_service, query, expected_output):
-    """Test LLM service responds correctly to varied queries."""
-    request_data = {"input": query}
-    response = llm_service.handle_request(request_data)
-    assert "output" in response
-    assert response["output"] == expected_output
+@pytest.mark.parametrize("input_data, expected_output",
+                         [
+                             ("input1", {"result": "output1"}),
+                             ("input2", {"result": "output2"}),
+                         ])
+def test_llm_service_multiple_predictions(input_data, expected_output):
+    """
+    Test the predict method with multiple inputs to verify consistent output.
+    """
+    service = LLMService()
+    result = service.predict(input_data)
+    assert result == expected_output,
+           f"Expected {expected_output} but got {result}"
