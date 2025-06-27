@@ -1,31 +1,49 @@
 import pytest
 from fastapi.testclient import TestClient
-from api.llm import app  # Import the FastAPI app
+from api.llm import app
+
+# Create a test client using the FastAPI app
+client = TestClient(app)
 
 
-@pytest.fixture(scope="module")
-def client():
-    """Fixture for the FastAPI test client."""
-    with TestClient(app) as c:
-        yield c
+# Test cases for LLM API endpoints
+class TestLLMAPI:
 
+    def test_llm_endpoint(self):
+        # Test the LLM API endpoint with a sample request payload
+        payload = {
+            "input_text": "Hello, AI!",
+            "model": "gpt-3.5-turbo"
+        }
+        response = client.post("/llm/generate", json=payload)
+        assert response.status_code == 200
+        data = response.json()
+        assert "output_text" in data
+        assert isinstance(data["output_text"], str)
 
-def test_llm_endpoint():
-    """Test the LLM endpoint for successful response."""
-    response = client().post("/llm/endpoint", json={"input": "test input"})
-    assert response.status_code == 200
-    assert "output" in response.json()
+    def test_llm_endpoint_invalid_model(self):
+        # Test the LLM API endpoint with an invalid model
+        payload = {
+            "input_text": "Hello, AI!",
+            "model": "invalid-model"
+        }
+        response = client.post("/llm/generate", json=payload)
+        assert response.status_code == 400
+        assert "error" in response.json()
 
+    def test_llm_endpoint_missing_fields(self):
+        # Test the LLM API endpoint with missing fields
+        payload = {"input_text": "Hello, AI!"}
+        response = client.post("/llm/generate", json=payload)
+        assert response.status_code == 422
+        assert "detail" in response.json()
 
-def test_llm_endpoint_invalid_data():
-    """Test the LLM endpoint with invalid data."""
-    response = client().post("/llm/endpoint", json={"invalid_key": "test"})
-    assert response.status_code == 422  # Unprocessable Entity
-    assert "detail" in response.json()
-
-
-def test_llm_endpoint_error_handling():
-    """Test the LLM endpoint for error handling."""
-    response = client().post("/llm/endpoint", json={"input": None})
-    assert response.status_code == 400  # Bad Request
-    assert "error" in response.json()
+    def test_llm_endpoint_empty_input(self):
+        # Test the LLM API endpoint with empty input text
+        payload = {
+            "input_text": "",
+            "model": "gpt-3.5-turbo"
+        }
+        response = client.post("/llm/generate", json=payload)
+        assert response.status_code == 400
+        assert "error" in response.json()
