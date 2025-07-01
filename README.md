@@ -2,6 +2,8 @@
 
 HAGAMEAI is a training framework for AI game evolution. By constructing diverse game scenario components, from strategic confrontations to simulation, it enhances AI's learning mechanisms, decision-making processes, and its ability to collaborate or compete with humans in complex environments, providing foundational AI support for all game-related scenarios.
 
+Experience AviaFlick, an ecological game based on HAGAMEAI, by visiting: [t.me/HAGAMEAI_CHANNEL](https://t.me/HAGAMEAI_CHANNEL)
+
 ---
 
 ## Architecture & Technology Stack
